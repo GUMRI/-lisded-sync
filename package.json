@@ -1,0 +1,8 @@
+{
+  "name": "sync-engine",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples"
+  ]
+}

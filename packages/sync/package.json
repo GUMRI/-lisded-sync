@@ -1,0 +1,10 @@
+{
+  "name": "@listed/sync",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./LSync.ts",
+  "dependencies": {
+    "automerge": "^0.14.2",
+    "firebase": "^12.5.0"
+  }
+}
