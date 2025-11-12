@@ -4,16 +4,15 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:examples": "vite"
+    "dev": "vite"
   },
   "dependencies": {
-    "@listed/sync": "workspace:*"
+    "@listed/sync": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "vite": "^4.0.0",
-
-  "tailwindcss": "^3.0.0",
+    "tailwindcss": "^3.0.0",
     "vite-plugin-wasm": "^3.0.0",
     "vite-plugin-top-level-await": "^1.3.0"
   }

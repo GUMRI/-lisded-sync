@@ -1,3 +1,9 @@
 
 > dev
-> npm-run-all --parallel dev:*
+> npm run dev --workspaces --if-present
+
+
+> @listed/sync@0.1.0 dev
+> tsc --watch
+
+[2J[3J[H1:03:43 AM - Starting compilation in watch mode...

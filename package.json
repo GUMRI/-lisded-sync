@@ -6,6 +6,6 @@
     "examples"
   ],
   "scripts": {
-    "dev": "npm-run-all --parallel dev:*"
+    "dev": "npm run dev --workspaces --if-present"
   }
 }
