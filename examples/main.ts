@@ -1,6 +1,6 @@
 
 import './style.css';
-import { LSync, LFirestore, LMemory } from '@listed/sync';
+import { SyncManager, FirestoreAdapter, InMemoryAdapter } from '@listed/sync';
 import { firebaseConfig } from './config';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
@@ -20,11 +20,11 @@ async function main() {
   const firestore = getFirestore(app);
 
   // Initialize adapters
-  const localAdapter = new LMemory();
-  const remoteAdapter = new LFirestore(firestore, 'documents');
+  const localAdapter = new InMemoryAdapter();
+  const remoteAdapter = new FirestoreAdapter(firestore, 'documents');
 
   // Initialize SyncManager
-  const syncManager = new LSync<TextDoc>(localAdapter, remoteAdapter);
+  const syncManager = new SyncManager<TextDoc>(localAdapter, remoteAdapter);
 
   // Subscribe to document changes
   syncManager.subscribe(docId, (doc) => {
