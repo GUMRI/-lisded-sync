@@ -4,7 +4,7 @@ import { LocalAdapter, LocalDocument } from './types.js';
 /**
  * An in-memory implementation of the LocalAdapter interface for testing and demonstration.
  */
-export class InMemoryAdapter implements LocalAdapter {
+export class LMemory implements LocalAdapter {
   private documents: Map<string, Uint8Array> = new Map();
 
   async get(id: string): Promise<Uint8Array | null> {

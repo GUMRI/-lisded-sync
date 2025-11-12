@@ -1,4 +1,4 @@
-export * from './SyncManager';
-export * from './FirestoreAdapter';
-export * from './InMemoryAdapter';
+export * from './sync';
+export * from './firestore';
+export * from './memory';
 export * from './types';

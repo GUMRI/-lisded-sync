@@ -12,7 +12,7 @@ import { RemoteAdapter, LocalDocument } from './types.js';
 /**
  * An implementation of the RemoteAdapter interface for Firestore.
  */
-export class FirestoreAdapter implements RemoteAdapter {
+export class LFirestore implements RemoteAdapter {
   private firestore: Firestore;
   private collectionName: string;
 

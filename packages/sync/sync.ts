@@ -4,7 +4,7 @@ import { LocalAdapter, RemoteAdapter, LocalDocument } from './types.js';
 /**
  * Manages the synchronization of Automerge documents between a local and remote adapter.
  */
-export class SyncManager<T> {
+export class LSyncEngine<T> {
   private localAdapter: LocalAdapter;
   private remoteAdapter: RemoteAdapter;
   private documents: Map<string, Automerge.Doc<T>> = new Map();
