@@ -1,23 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Listedb SyncManager Example</title>
+    <title>Sync Engine Example</title>
+    <script type="module" src="/main.ts"></script>
+    <link rel="stylesheet" href="/style.css" />
   </head>
-  <body>
-    <div id="app">
-      <h1>Listedb SyncManager Example</h1>
-      <p>This example demonstrates a collaborative text editor using the SyncManager.</p>
-      <div class="editor-container">
-        <textarea id="editor" rows="10" cols="80" disabled></textarea>
-      </div>
-      <div class="state-container">
-        <h2>Document State</h2>
-        <pre id="state"></pre>
+  <body class="h-full">
+    <div id="app" class="min-h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div class="max-w-4xl w-full space-y-8">
+
+        <!-- Header -->
+        <div class="text-center">
+          <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+            Sync Engine Example
+          </h1>
+          <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+            This example demonstrates a collaborative text editor.
+          </p>
+        </div>
+
+        <!-- Editor Card -->
+        <div class="bg-white p-6 shadow-lg rounded-lg">
+          <label for="editor" class="block text-sm font-medium text-gray-700 mb-2">Collaborative Editor</label>
+          <textarea id="editor" rows="10" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" disabled></textarea>
+        </div>
+
+        <!-- State Card -->
+        <div class="bg-white p-6 shadow-lg rounded-lg">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">Document State</h2>
+          <div class="bg-gray-50 p-4 rounded-md overflow-x-auto">
+            <pre id="state" class="text-sm text-gray-600"></pre>
+          </div>
+        </div>
+
       </div>
     </div>
-    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

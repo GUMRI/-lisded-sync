@@ -1,7 +1,7 @@
 
 import './style.css';
-import { SyncManager, FirestoreAdapter, InMemoryAdapter } from 'listedb-sync-manager';
-import { firebaseConfig } from './firebase-config';
+import { LSync, LFirestore, LMemory } from '@listed/sync';
+import { firebaseConfig } from './config';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
@@ -20,15 +20,17 @@ async function main() {
   const firestore = getFirestore(app);
 
   // Initialize adapters
-  const localAdapter = new InMemoryAdapter();
-  const remoteAdapter = new FirestoreAdapter(firestore, 'documents');
+  const localAdapter = new LMemory();
+  const remoteAdapter = new LFirestore(firestore, 'documents');
 
   // Initialize SyncManager
-  const syncManager = new SyncManager<TextDoc>(localAdapter, remoteAdapter);
+  const syncManager = new LSync<TextDoc>(localAdapter, remoteAdapter);
 
   // Subscribe to document changes
   syncManager.subscribe(docId, (doc) => {
-  editor.value = doc.text || '';
+    if (doc && editor.value !== doc.text) {
+      editor.value = doc.text || '';
+    }
     state.textContent = JSON.stringify(doc, null, 2);
   });
 
@@ -47,7 +49,6 @@ async function main() {
 
   // Handle editor input
   editor.addEventListener('input', () => {
-    
     syncManager.updateDocument(docId, (doc) => {
      doc.text = editor.value;
    });
