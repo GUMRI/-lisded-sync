@@ -4,5 +4,8 @@
   "workspaces": [
     "packages/*",
     "examples"
-  ]
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:*"
+  }
 }

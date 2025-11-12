@@ -1,0 +1,5 @@
+
+> @listed/sync@0.1.0 dev:sync
+> tsc --watch
+
+[2J[3J[H12:42:53 AM - Starting compilation in watch mode...
