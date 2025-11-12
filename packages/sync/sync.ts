@@ -1,8 +1,10 @@
 
 import * as Automerge from '@automerge/automerge';
 import { LocalAdapter, RemoteAdapter, LocalDocument } from './types.js';
+
 /**
  * Manages the synchronization of Automerge documents between a local and remote adapter.
+ * @template T The type of the Automerge document.
  */
 export class LSyncEngine<T> {
   private localAdapter: LocalAdapter;
@@ -10,7 +12,11 @@ export class LSyncEngine<T> {
   private documents: Map<string, Automerge.Doc<T>> = new Map();
   private subscribers: Map<string, ((doc: Automerge.Doc<T>) => void)[]> = new Map();
   private isOnline: boolean = navigator.onLine;
-
+  /**
+   * Creates an instance of LSyncEngine.
+   * @param localAdapter The local adapter to use for storing documents.
+   * @param remoteAdapter The remote adapter to use for syncing documents.
+   */
   constructor(localAdapter: LocalAdapter, remoteAdapter: RemoteAdapter) {
     this.localAdapter = localAdapter;
     this.remoteAdapter = remoteAdapter;
@@ -25,6 +31,7 @@ export class LSyncEngine<T> {
   /**
    * Initializes the SyncManager by loading local and remote documents
    * and starting the synchronization process.
+   * @returns {Promise<void>}
    */
   async bootstrap(): Promise<void> {
     const localDocs = await this.localAdapter.getAll();
@@ -55,6 +62,7 @@ export class LSyncEngine<T> {
 
   /**
    * Subscribes to incoming document changes from the remote adapter.
+   * @returns {() => void} An unsubscribe function.
    */
   watchRemote(): () => void {
     return this.remoteAdapter.watch(this.handleIncomingDocument.bind(this));
@@ -63,6 +71,7 @@ export class LSyncEngine<T> {
   /**
    * Handles an incoming document from the remote adapter.
    * @param remoteDoc The incoming document.
+   * @private
    */
   private async handleIncomingDocument(remoteDoc: LocalDocument): Promise<void> {
     const { id, binary } = remoteDoc;
@@ -86,6 +95,8 @@ export class LSyncEngine<T> {
    * Creates a new document, saves it locally, and sends it to the remote.
    * @param docId The ID of the new document.
    * @param initialDoc The initial state of the document.
+   * @returns {Promise<void>}
+   * @throws {Error} If a document with the same ID already exists.
    */
   async createDocument(docId: string, initialDoc: T): Promise<void> {
     if (this.documents.has(docId)) {
@@ -107,6 +118,8 @@ export class LSyncEngine<T> {
    * Applies a local change to a document, saves it, and triggers synchronization.
    * @param docId The ID of the document to change.
    * @param changeFn The function that applies the change.
+   * @returns {Promise<void>}
+   * @throws {Error} If the document is not found.
    */
   async updateDocument(docId: string, changeFn: (doc: T) => void): Promise<void> {
     const doc = this.documents.get(docId);
@@ -127,6 +140,7 @@ export class LSyncEngine<T> {
 
   /**
    * Synchronizes all documents with the remote peer.
+   * @private
    */
   private synchronizeAll(): void {
     for (const [docId, doc] of this.documents.entries()) {
@@ -170,6 +184,7 @@ export class LSyncEngine<T> {
   /**
    * Notifies all subscribers of a document change.
    * @param docId The ID of the document that changed.
+   * @private
    */
   private notifySubscribers(docId: string): void {
     const doc = this.documents.get(docId);
