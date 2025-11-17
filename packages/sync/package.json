@@ -9,13 +9,17 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest"
   },
   "dependencies": {
-    "@automerge/automerge": "^3.2.0",
+    "yjs": "^13.6.8",
+    "y-protocols": "^1.0.5",
     "firebase": "^12.5.0"
   },
   "devDependencies": {
+    "vitest": "^0.34.6",
+    "jsdom": "^22.1.0",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.0.0"
   }
