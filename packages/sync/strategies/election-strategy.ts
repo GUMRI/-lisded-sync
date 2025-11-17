@@ -33,6 +33,10 @@ export class ElectionStrategy {
     return this.janitorId === this.awareness.clientID.toString();
   }
 
+  getClientId(): number {
+    return this.awareness.clientID;
+  }
+
   private handleAwarenessChange = () => {
     this.elect();
   };

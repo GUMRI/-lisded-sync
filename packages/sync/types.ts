@@ -8,7 +8,7 @@ export abstract class AbstractLocalAdapter {
 }
 
 export abstract class AbstractRemoteAdapter {
-  abstract watch(listName: string, callback: (docId: string, binary: Uint8Array) => void): () => void;
-  abstract send(listName: string, docId: string, binary: Uint8Array): Promise<void>;
+  abstract watch(listName: string, callback: (docId: string, binary: Uint8Array, clientId?: string) => void): () => void;
+  abstract send(listName: string, docId: string, binary: Uint8Array, clientId?: string): Promise<void>;
   abstract getSnapshot(listName: string): Promise<Record<string, Uint8Array>>;
 }

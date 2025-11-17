@@ -39,18 +39,6 @@ describe('LSyncProvider', () => {
     expect(localAdapter.get).toHaveBeenCalledWith('test', 'doc');
   });
 
-  it('should bootstrap and load data from remote adapter if online', async () => {
-    const localAdapter = new MockLocalAdapter();
-    const remoteAdapter = new MockRemoteAdapter();
-    remoteAdapter.getSnapshot.mockResolvedValue({});
-    const provider = new LSyncProvider('test', localAdapter, remoteAdapter);
-
-    Object.defineProperty(navigator, 'onLine', { value: true });
-
-    await provider.bootstrap();
-
-    expect(remoteAdapter.getSnapshot).toHaveBeenCalledWith('test');
-  });
 
   it('should create snapshot if janitor', () => {
     const localAdapter = new MockLocalAdapter();
@@ -130,5 +118,58 @@ describe('LSyncProvider', () => {
     const stateVector = provider.createStateVector();
 
     expect(stateVector).toBeNull();
+  });
+
+  it('should send state vector request on online', () => {
+    const localAdapter = new MockLocalAdapter();
+    const remoteAdapter = new MockRemoteAdapter();
+    const electionStrategy = new ElectionStrategy(new Y.Doc());
+    const provider = new LSyncProvider(
+      'test',
+      localAdapter,
+      remoteAdapter,
+      new Y.Doc(),
+      undefined,
+      undefined,
+      electionStrategy
+    );
+
+    // Manually trigger online event
+    provider['handleOnline']();
+
+    expect(remoteAdapter.send).toHaveBeenCalledWith(
+      'test',
+      'state-vector-request',
+      expect.any(Uint8Array),
+      electionStrategy.getClientId().toString()
+    );
+  });
+
+  it('janitor should handle state vector request', () => {
+    const localAdapter = new MockLocalAdapter();
+    const remoteAdapter = new MockRemoteAdapter();
+    const electionStrategy = new ElectionStrategy(new Y.Doc());
+    electionStrategy.isJanitor = vi.fn().mockReturnValue(true);
+    const provider = new LSyncProvider(
+      'test',
+      localAdapter,
+      remoteAdapter,
+      new Y.Doc(),
+      undefined,
+      undefined,
+      electionStrategy
+    );
+
+    const clientDoc = new Y.Doc();
+    const stateVector = Y.encodeStateVector(clientDoc);
+
+    // Manually trigger remote update
+    provider['handleRemoteUpdate']('state-vector-request', stateVector, '123');
+
+    expect(remoteAdapter.send).toHaveBeenCalledWith(
+      'test',
+      'state-vector-response:123',
+      expect.any(Uint8Array)
+    );
   });
 });

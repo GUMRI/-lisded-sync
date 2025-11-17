@@ -51,17 +51,23 @@ export class LSyncProvider {
     }
 
     if (this.networkObserver.isOnline()) {
-      const remoteSnapshot = await this.remoteAdapter.getSnapshot(this.listName);
-      for (const [docId, binary] of Object.entries(remoteSnapshot)) {
-        if (docId === 'doc') {
-          Y.applyUpdate(this.doc, binary);
-        }
-      }
+      this.handleOnline();
     }
 
+    this.networkObserver.onOnline(this.handleOnline);
     this.doc.on('update', this.handleLocalUpdate);
     this.remoteAdapter.watch(this.listName, this.handleRemoteUpdate);
   }
+
+  private handleOnline = () => {
+    const stateVector = this.stateVectorStrategy.createStateVector(this.doc);
+    this.remoteAdapter.send(
+      this.listName,
+      'state-vector-request',
+      stateVector,
+      this.electionStrategy.getClientId().toString()
+    );
+  };
 
   private handleLocalUpdate = (update: Uint8Array) => {
     this.localAdapter.put(this.listName, 'doc', Y.encodeStateAsUpdate(this.doc));
@@ -72,8 +78,13 @@ export class LSyncProvider {
     }
   };
 
-  private handleRemoteUpdate = (docId: string, binary: Uint8Array) => {
-    if (docId === 'doc') {
+  private handleRemoteUpdate = (docId: string, binary: Uint8Array, clientId?: string) => {
+    if (docId === 'state-vector-request' && this.electionStrategy.isJanitor() && clientId) {
+      const update = Y.encodeStateAsUpdate(this.doc, binary);
+      this.remoteAdapter.send(this.listName, `state-vector-response:${clientId}`, update);
+    } else if (docId === `state-vector-response:${this.electionStrategy.getClientId()}`) {
+      Y.applyUpdate(this.doc, binary);
+    } else if (docId === 'doc') {
       Y.applyUpdate(this.doc, binary);
     }
   };
