@@ -1,11 +1,11 @@
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-
-interface ClientMetrics {
-  cpu: number;
-  memory: number;
-  networkLatency: number;
-}
+import {
+  getNetworkInfo,
+  getDeviceMemory,
+  getCpuPressure,
+  ClientMetrics,
+} from '../utils/client-metrics';
 
 export class ElectionStrategy {
   private awareness: Awareness;
@@ -16,6 +16,17 @@ export class ElectionStrategy {
     this.doc = doc;
     this.awareness = new Awareness(this.doc);
     this.awareness.on('change', this.handleAwarenessChange);
+    this.updateClientMetrics();
+  }
+
+  private updateClientMetrics() {
+    const networkInfo = getNetworkInfo();
+    this.awareness.setLocalStateField('metrics', {
+      downlink: networkInfo.downlink,
+      rtt: networkInfo.rtt,
+      deviceMemory: getDeviceMemory(),
+      cpuPressure: getCpuPressure(),
+    });
   }
 
   elect(): void {
@@ -47,29 +58,32 @@ export class ElectionStrategy {
 
     for (const client of clients) {
       const metrics = this.getClientMetrics(client);
-      const score = this.calculateScore(metrics);
+      if (metrics) {
+        const score = this.calculateScore(metrics);
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestClient = client;
+        if (score > bestScore) {
+          bestScore = score;
+          bestClient = client;
+        }
       }
     }
 
     return bestClient;
   }
 
-  private getClientMetrics(client: [number, any]): ClientMetrics {
-    // TODO: Implement actual metric gathering
-    return {
-      cpu: 1,
-      memory: 1,
-      networkLatency: 1,
-    };
+  private getClientMetrics(client: [number, any]): ClientMetrics | null {
+    const state = this.awareness.getStates().get(client[0]);
+    return state ? state.metrics : null;
   }
 
   private calculateScore(metrics: ClientMetrics): number {
-    // TODO: Implement a more sophisticated scoring algorithm
-    return 1;
+    let score = 0;
+    if (metrics.downlink > -1) score += metrics.downlink;
+    if (metrics.rtt > -1) score -= metrics.rtt;
+    if (metrics.deviceMemory > -1) score += metrics.deviceMemory;
+    if (metrics.cpuPressure === 'nominal') score += 100;
+    if (metrics.cpuPressure === 'fair') score += 50;
+    return score;
   }
 
   destroy(): void {
